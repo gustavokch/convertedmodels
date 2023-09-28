@@ -186,12 +186,12 @@ class StableDiffusionPipeline(DiffusionPipeline, TextualInversionLoaderMixin, Lo
             tokenizer=tokenizer,
             unet=unet,
             scheduler=scheduler,
-            safety_checker=safety_checker,
+            safety_checker=None,
             feature_extractor=feature_extractor,
         )
         self.vae_scale_factor = 2 ** (len(self.vae.config.block_out_channels) - 1)
         self.image_processor = VaeImageProcessor(vae_scale_factor=self.vae_scale_factor)
-        self.register_to_config(requires_safety_checker=requires_safety_checker)
+        self.register_to_config(requires_safety_checker=False)
 
     def enable_vae_slicing(self):
         r"""
@@ -699,7 +699,7 @@ class StableDiffusionPipeline(DiffusionPipeline, TextualInversionLoaderMixin, Lo
 
         if not output_type == "latent":
             image = self.vae.decode(latents / self.vae.config.scaling_factor, return_dict=False)[0]
-            image, has_nsfw_concept = self.run_safety_checker(image, device, prompt_embeds.dtype)
+            image, has_nsfw_concept = None
         else:
             image = latents
             has_nsfw_concept = None
